@@ -20,12 +20,12 @@ namespace Controller {
         {
             // TODO: Implement connect() method.
             $userController = $app['controllers_factory'];
-            $userController->get("/signup", array($this, 'signup'))->bind('signup');
+            $userController->get("/profile", array($this, 'profile'))->bind('profile');
             return $userController;
         }
 
 
-        function signup( Application $app )
+        function profile( Application $app )
         {
             return $app['twig']->render('index.html.twig', array());
 

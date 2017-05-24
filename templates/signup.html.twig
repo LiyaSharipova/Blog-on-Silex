@@ -1,0 +1,10 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+    Sign Up!!
+    <form action="#" method="post">
+        {% form_theme form 'form_table_layout.html.twig' %}
+        {{ form_widget(form) }}
+
+    </form>
+{% endblock %}
