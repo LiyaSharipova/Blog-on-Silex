@@ -1,0 +1,29 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+    <h1>login page</h1>
+
+    {#{% if error %}#}
+        {#ERROR : {{ error }}#}
+    {#{% endif %}#}
+    {#<form action="{{ path('login_check') }}" method="post">#}
+        {#{% form_theme form 'form_table_layout.html.twig' %}#}
+        {#{{ form_widget(form) }}#}
+    {#</form>#}
+
+
+    {% if app.user %}
+        You are already logged in. Log out first
+
+    {% else %}
+        {% if error %}
+        ERROR : {{ error }}
+        {% endif %}
+        <form action="{{ path('login_check') }}" method="post">
+        {% form_theme form 'form_table_layout.html.twig' %}
+        {{ form_widget(form) }}
+        </form>
+
+    {% endif %}
+
+{% endblock %}

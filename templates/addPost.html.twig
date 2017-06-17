@@ -1,0 +1,14 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+    <h1>Make Post</h1>
+    <h1>TinyMCE Quick Start Guide</h1>
+    <form method="post">
+        <input type="text" name="title" placeholder="title">
+        <textarea id="mytextarea" name="postBody">Hello, World!</textarea>
+        <input type="submit" value="Add">
+    </form>
+
+
+    {{ post|raw }}
+{% endblock %}

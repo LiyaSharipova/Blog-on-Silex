@@ -8,37 +8,18 @@
 
 namespace Controller {
 
-    use Silex\Api\ControllerProviderInterface;
     use Silex\Application;
-    use Silex\ControllerCollection;
     use Symfony\Component\Form\Extension\Core\Type\EmailType;
     use Symfony\Component\Form\Extension\Core\Type\FormType;
     use Symfony\Component\Form\Extension\Core\Type\PasswordType;
     use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+    use Symfony\Component\Form\Extension\Core\Type\TextareaType;
     use Symfony\Component\Form\Extension\Core\Type\TextType;
     use Symfony\Component\HttpFoundation\Request;
     use Symfony\Component\Validator\Constraints as Assert;
 
-    class IndexController implements ControllerProviderInterface
+    class IndexController
     {
-
-        /**
-         * Returns routes to connect to the given application.
-         *
-         * @param Application $app An Application instance
-         *
-         * @return ControllerCollection A ControllerCollection instance
-         */
-        public function connect(Application $app)
-        {
-            // TODO: Implement connect() method.
-            $indexController = $app['controllers_factory'];
-            $indexController->get("/", array($this, 'index'))->bind('default');
-            $indexController->match("/signup", array($this, 'signup'))->bind('signup');
-
-
-            return $indexController;
-        }
 
 
         function index(Application $app)
@@ -70,11 +51,18 @@ namespace Controller {
 
             if ($form->isValid()) {
                 $data = $form->getData();
-
+//                $password = $app['security.encoder.digest']->encodePassword($data['password'], '');
+                $role = 'ROLE_USER';
+                $app['db']->insert('user', array(
+                    'login' => $data['login'],
+                    'email' => $data['email'],
+                    'password' => $data['password'],
+                    'roles' => $role
+                ));
                 // do something with the data
 
                 // redirect somewhere
-                return $app->redirect('...');
+                return $app->redirect('user/login');
             }
 
             // display the form
@@ -82,6 +70,8 @@ namespace Controller {
 //            return $app['twig']->render('signup.html.twig', array());
 
         }
+
+
     }
 }
 
