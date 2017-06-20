@@ -6,5 +6,5 @@
  * Time: 22:10
  */
 $app->mount( '/user', new Controller\Provider\UserControllerProvider() );
-$app->mount( '/', new Controller\Provider\IndexProvider() );
-$app->mount( '/post', new Controller\Provider\PostProvider() );
+$app->mount( '/', new Controller\IndexController($app['user.repo']) );
+$app->mount( '/post', new Controller\PostController($app['post.repo'], $app['user.repo']) );

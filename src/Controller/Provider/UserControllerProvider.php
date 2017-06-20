@@ -28,7 +28,6 @@ class UserControllerProvider implements ControllerProviderInterface
         // TODO: Implement connect() method.
         $userController = $app['controllers_factory'];
         $userController->get("/profile", "Controller\\UserController::profile")->bind('profile');
-        $userController->match("/login", "Controller\\UserController::login")->bind('login');
 
         return $userController;
     }

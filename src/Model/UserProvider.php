@@ -11,9 +11,9 @@ namespace Model;
 
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
-use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
+use Model\User;
 
 
 class UserProvider extends BaseModel implements UserProviderInterface
@@ -31,39 +31,18 @@ class UserProvider extends BaseModel implements UserProviderInterface
      *
      * @throws UsernameNotFoundException if the user is not found
      */
-    public function loadUserByUsername($email)
+    public function loadUserByUsername($username)
     {
-        $stmt = $this->db->executeQuery('SELECT * FROM user WHERE email = ?', array(strtolower($email)));
+        $stmt = $this->db->executeQuery('SELECT * FROM user WHERE login = ?', array(strtolower($username)));
 
         if (!$user = $stmt->fetch()) {
-            throw new UsernameNotFoundException(sprintf('Username "%s" does not exist.', $email));
+            throw new UsernameNotFoundException(sprintf('Username "%s" does not exist.', $username));
         }
+        $currentUser = new User($user['login'], $user['password'], explode(',', $user['roles']), true, true, true, true);
+        $currentUser->setPhoto("PHOTO");
+        return $currentUser;
 
-        return new User($user['email'], $user['password'], explode(',', $user['roles']), true, true, true, true);
 
-//        $email = strtolower($email);
-//        $sql = <<<SQL
-//SELECT
-//	`email`,
-//	`password`,
-//	`roles`
-//FROM
-//	`user`
-//WHERE
-//	email = ?
-//SQL;
-//        $stmt = $this->db->executeQuery($sql, array($email));
-//        if (!$user = $stmt->fetch()) {
-//            throw new UsernameNotFoundException(sprintf('Username "%s" does not exist.', $email));
-//        }
-//        return new User(
-//            $user['email'],
-//            $user['password'],
-//            explode(',', $user['roles']),
-//            true,
-//            true,
-//            true,
-//            true);
     }
 
     /**
@@ -99,6 +78,6 @@ class UserProvider extends BaseModel implements UserProviderInterface
     public function supportsClass($class)
     {
         // TODO: Implement supportsClass() method.
-        return $class === 'Symfony\Component\Security\Core\User\User';
+        return $class === '\Model\User';
     }
 }
