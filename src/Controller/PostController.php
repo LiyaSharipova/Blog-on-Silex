@@ -9,29 +9,34 @@
 namespace Controller;
 
 
+use Form\CommentForm;
 use Form\PostForm;
+use Model\Comment;
 use Model\Post;
-use Model\UserProvider;
+use Repo\Interfaces\ICommentRepo;
 use Repo\Interfaces\IPostRepo;
 use Repo\Interfaces\IUserRepo;
 use Silex\Api\ControllerProviderInterface;
 use Silex\Application;
 use Silex\ControllerCollection;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\User;
 
 class PostController implements ControllerProviderInterface
 {
     protected $postRepo;
     protected $userRepo;
+    protected $commentRepo;
 
     /**
      * PostController constructor.
      * @param $postRepo
      */
-    public function __construct(IPostRepo $postRepo, IUserRepo $userRepo)
+    public function __construct(IPostRepo $postRepo, IUserRepo $userRepo, ICommentRepo $commentRepo)
     {
         $this->postRepo = $postRepo;
         $this->userRepo = $userRepo;
+        $this->commentRepo = $commentRepo;
     }
 
 
@@ -48,7 +53,9 @@ class PostController implements ControllerProviderInterface
 
         $postController = $app['controllers_factory'];
         $postController->match("/add", array($this, "add"))->bind('addPost');
-        $postController->match("/all", array($this, "getAllPosts"))->bind('all');
+        $postController->match("/addComment", array($this, "add"))->bind('addComment');
+        $postController->get("/all", array($this, "getAllPosts"))->bind('all');
+        $postController->match("/{id}", array($this, "getPostPage"))->bind('postPage');
 
         return $postController;
     }
@@ -73,9 +80,32 @@ class PostController implements ControllerProviderInterface
 
     }
 
-    function getAllPosts(Application $app)
+    function getAllPosts(Application $app, Request $request)
     {
-        return $app['twig']->render('allPosts.html.twig', array());
 
+        $posts = $this->postRepo->getPosts();
+
+        return $app['twig']->render('allPostsPage.html.twig', array("posts" => $posts, "count" => count($posts),));
+
+    }
+
+    function getPostPage(Application $app, $id, Request $request)
+    {
+        $post = $this->postRepo->getById($id);
+        $form = $app['form.factory']->create(CommentForm::class);
+        $form->handleRequest($request);
+        $comments = $this->commentRepo->getComments($id);
+
+        if ($form->isValid()) {
+            $data = $form->getData();
+            $user = $this->userRepo->getUser();
+            $comment = new Comment($user, $id, $data['content']);
+            $this->commentRepo->insert($comment);
+//            $user = $app['security.token_storage']->getToken()->getUser();
+//            $user->getUsername();
+
+        }
+
+        return $app['twig']->render('postPage.html.twig', array("post" => $post, "form"=> $form->createView(), "comments"=> $comments ));
     }
 }

@@ -1,5 +1,6 @@
 <?php
 
+use Repo\CommentRepo;
 use Repo\PostRepo;
 use Repo\UserRepo;
 use Silex\Provider\AssetServiceProvider;
@@ -110,12 +111,16 @@ $app['twig'] = $app->extend('twig', function ($twig, $app) {
 
 
 $app->register(new Silex\Provider\ServiceControllerServiceProvider());
-$app['post.repo'] = function (\Silex\Application $app) {
-    return new PostRepo($app['db'], $app);
-};
 $app['user.repo'] = function (\Silex\Application $app) {
     return new UserRepo($app['db'], $app);
 };
+$app['post.repo'] = function (\Silex\Application $app) {
+    return new PostRepo($app['db'], $app, $app['user.repo']);
+};
+$app['comment.repo'] = function (\Silex\Application $app) {
+    return new CommentRepo($app['db'], $app, $app['user.repo']);
+};
+
 
 
 require PATH_SRC . '/routes.php';

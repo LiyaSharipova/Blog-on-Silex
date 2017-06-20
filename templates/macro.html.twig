@@ -1,0 +1,8 @@
+{% macro print_comments_recursively(comment) %}
+    <div class="response">
+        <p>{{ comment.content }}</p> {# implement __toString on your Comment class or print appropriate property #}
+        {% if comment.response is not null  %}
+            {{ _self.print_comments_recursively(comment.response) }}
+        {% endif %}
+    </div>
+{% endmacro %}

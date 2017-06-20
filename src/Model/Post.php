@@ -11,7 +11,10 @@ namespace Model;
 
 class Post
 {
-    private $ts;
+    private $id;
+
+
+    private $date;
     private $author;
     private $title;
     private $content;
@@ -33,17 +36,17 @@ class Post
     /**
      * @return mixed
      */
-    public function getTs()
+    public function getDate()
     {
-        return $this->ts;
+        return $this->date;
     }
 
     /**
-     * @param mixed $ts
+     * @param mixed $date
      */
-    public function setTs($ts)
+    public function setDate($date)
     {
-        $this->ts = $ts;
+        $this->date = date('M j Y g:i A', strtotime($date));;
     }
 
     /**
@@ -92,6 +95,22 @@ class Post
     public function setContent($content)
     {
         $this->content = $content;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @param mixed $id
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
     }
 
 }

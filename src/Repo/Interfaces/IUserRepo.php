@@ -10,12 +10,15 @@ namespace Repo\Interfaces;
 
 
 use Model\User;
-use Silex\Application;
 
 interface IUserRepo
 {
     function insert(User $user);
+
     function getUser();
+
     function getByUsername($username);
+
+    function getById($id);
 
 }

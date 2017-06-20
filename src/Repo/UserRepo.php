@@ -11,7 +11,6 @@ namespace Repo;
 
 use Model\User;
 use Repo\Interfaces\IUserRepo;
-use Silex\Application;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 
 class UserRepo extends BaseRepo implements IUserRepo
@@ -34,7 +33,8 @@ class UserRepo extends BaseRepo implements IUserRepo
 //        if (null != $token):
 //            $user = $token->getUser();
         $user = $this->_app['security.token_storage']->getToken()->getUser();
-            return $this->getByUsername($user->getUsername());
+
+        return $this->getByUsername($user->getUsername());
 //        endif;
     }
 
@@ -49,7 +49,20 @@ class UserRepo extends BaseRepo implements IUserRepo
         $currentUser = new User($user['login'], $user['password'], explode(',', $user['roles']), true, true, true, true);
         $currentUser->setId($user['id']);
         $currentUser->setPhoto("PHOTO");
+        $currentUser->setEmail($user['email']);
+
         return $currentUser;
 
+    }
+
+    function getById($id)
+    {
+        $stmt = $this->db->executeQuery('SELECT * FROM user WHERE id = ?', array(strtolower($id)));
+        $user = $stmt->fetch();
+        $currentUser = new User($user['login'], $user['password'], explode(',', $user['roles']), true, true, true, true);
+        $currentUser->setId($user['id']);
+        $currentUser->setPhoto($user['photo']);
+        $currentUser->setEmail($user['email']);
+        return $currentUser;
     }
 }
