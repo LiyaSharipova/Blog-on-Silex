@@ -15,6 +15,7 @@ use Form\CommentForm;
 use Form\PostForm;
 use Model\Comment;
 use Model\Post;
+use function PHPSTORM_META\map;
 use Repo\Interfaces\ICommentRepo;
 use Repo\Interfaces\IPostRepo;
 use Repo\Interfaces\IUserRepo;
@@ -127,10 +128,9 @@ class PostController implements ControllerProviderInterface
         foreach ($comments as $comment) {
             if ($comment->getParentId() == null) {
                 $inheritanceLevel = 0;
-                $commentNode = $this->createCommentNode($comment, $childsOfEachComment, ++$inheritanceLevel);
-                $commentNode->setInheritanceLevel($inheritanceLevel);
+                $commentNode = $this->createCommentNode($comment, $childsOfEachComment, $inheritanceLevel++);
+                $commentNode->setInheritanceLevel(0);
                 array_push($commentsTree, $commentNode);
-                $inheritanceLevel = 0;
             }
         }
         return $commentsTree;
@@ -150,14 +150,22 @@ class PostController implements ControllerProviderInterface
         $date = date('M j Y g:i A', strtotime($comment->getTs()));;
         $commentNode->setDate($date);
 
-        if ($this->hasComments($comment, $childsOfEachComment))
+        if ($this->hasComments($comment, $childsOfEachComment)) {
             foreach ($childsOfEachComment[$comment->getId()] as $childComment) {
                 $childCommentNode = $this->createCommentNode($childComment, $childsOfEachComment, ++$inheritanceLevel);
-                $commentNode->addChild($childCommentNode);
+                $childs = $commentNode->getChilds();
+                var_dump($childCommentNode);
+                $childs[] =  $childCommentNode;
+                var_dump($childs);
+                $commentNode->setChilds($childs);
+
             }
+        }
+
 
         if ($commentNode->getChilds() !== null && sizeof($commentNode->getChilds()) != 0) {
-            uasort($commentNode->getChilds(), function (CommentNodeDto $comment1, CommentNodeDto $comment2) {
+            $childs = $commentNode->getChilds();
+            uasort($childs, function (CommentNodeDto $comment1, CommentNodeDto $comment2) {
                 if ($comment1->getDate() == $comment2->getDate()) {
                     return 0;
                 }
@@ -187,11 +195,18 @@ class PostController implements ControllerProviderInterface
         $mapChilds = array();
         foreach ($comments as $comment) {
             if ($comment->getParentId() != null) {
-                if ($mapChilds[$comment->getParentId()] == null)
+                try {
+                    $mapChilds[$comment->getParentId()];
+                } catch (ErrorException $e) {
                     $mapChilds[$comment->getParentId()] = array();
+                }
+
+//                if ($mapChilds[$comment->getParentId()] == null)
+//                    $mapChilds[$comment->getParentId()] = array();
                 array_push($mapChilds[$comment->getParentId()], $comment);
             }
         }
+
         return $mapChilds;
     }
 

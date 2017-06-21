@@ -44,6 +44,7 @@ class CommentRepo extends BaseRepo implements ICommentRepo
             $content = $comment_res['content'];
             $comment = new Comment($user, $post_id, $content);
             $comment->setTs($comment_res['ts']);
+            $comment->setParentId($comment_res['parent_id']);
             $comment->setId($comment_res['id']);
             array_push($comments, $comment);
         }

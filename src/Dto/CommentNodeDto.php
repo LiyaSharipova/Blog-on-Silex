@@ -1,4 +1,5 @@
 <?php
+
 namespace Dto;
 /**
  * Created by PhpStorm.
@@ -11,7 +12,7 @@ class CommentNodeDto
     private $content;
     private $date;
     private $user;
-    private $childs;
+    private $childs = array();
     private $inheritanceLevel;
 
     /**
@@ -93,10 +94,6 @@ class CommentNodeDto
     {
         $this->childs = $childs;
         return $this;
-    }
-
-    public function addChild($child){
-        array_push($childs, $child);
     }
 
     /**
