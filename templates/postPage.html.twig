@@ -42,14 +42,19 @@
 
             {% endif %}
 
+            {#{% for comment in comments %}#}
+                {#{% import 'macro.html.twig' as macros %}#}
+                {#<div class="comment">#}
+                    {#<p>{{ comment.content }}</p>#}
+                    {#{% if comment.response %}#}
+                        {#{{ macros.print_comments_recursively(comment.response) }}#}
+                    {#{% endif %}#}
+                {#</div>#}
+            {#{% endfor %}#}
+
             {% for comment in comments %}
                 {% import 'macro.html.twig' as macros %}
-                <div class="comment">
-                    <p>{{ comment.content }}</p>
-                    {% if comment.response %}
-                        {{ macros.print_comments_recursively(comment.response) }}
-                    {% endif %}
-                </div>
+                {{ macros.print_comments_recursively(comment) }}
             {% endfor %}
 
             <!-- Posted Comments -->

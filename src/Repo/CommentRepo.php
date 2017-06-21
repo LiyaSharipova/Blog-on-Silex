@@ -43,7 +43,7 @@ class CommentRepo extends BaseRepo implements ICommentRepo
             $user = $this->userRepo->getById($comment_res['user_id']);
             $content = $comment_res['content'];
             $comment = new Comment($user, $post_id, $content);
-            $comment->setDate($comment_res['ts']);
+            $comment->setTs($comment_res['ts']);
             $comment->setId($comment_res['id']);
             array_push($comments, $comment);
         }

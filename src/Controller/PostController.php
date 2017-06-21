@@ -9,6 +9,8 @@
 namespace Controller;
 
 
+use Dto\CommentNodeDto;
+use ErrorException;
 use Form\CommentForm;
 use Form\PostForm;
 use Model\Comment;
@@ -20,7 +22,6 @@ use Silex\Api\ControllerProviderInterface;
 use Silex\Application;
 use Silex\ControllerCollection;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Security\Core\User;
 
 class PostController implements ControllerProviderInterface
 {
@@ -96,6 +97,8 @@ class PostController implements ControllerProviderInterface
         $form->handleRequest($request);
         $comments = $this->commentRepo->getComments($id);
 
+        $commentsTree = $this->buildCommentsTree($comments);
+
         if ($form->isValid()) {
             $data = $form->getData();
             $user = $this->userRepo->getUser();
@@ -106,6 +109,91 @@ class PostController implements ControllerProviderInterface
 
         }
 
-        return $app['twig']->render('postPage.html.twig', array("post" => $post, "form"=> $form->createView(), "comments"=> $comments ));
+        return $app['twig']->render('postPage.html.twig', array("post" => $post, "form" => $form->createView(), "comments" => $commentsTree));
     }
+
+    function buildCommentsTree(array $comments): array
+    {
+        $commentsTree = array();
+        uasort($comments, function (Comment $comment1, Comment $comment2) {
+            if ($comment1->getTs() == $comment2->getTs()) {
+                return 0;
+            }
+            return ($comment1->getTs() < $comment2->getTs()) ? -1 : 1;
+        });
+
+        $childsOfEachComment = $this->buildChildsOfEachComment($comments);
+
+        foreach ($comments as $comment) {
+            if ($comment->getParentId() == null) {
+                $inheritanceLevel = 0;
+                $commentNode = $this->createCommentNode($comment, $childsOfEachComment, ++$inheritanceLevel);
+                $commentNode->setInheritanceLevel($inheritanceLevel);
+                array_push($commentsTree, $commentNode);
+                $inheritanceLevel = 0;
+            }
+        }
+        return $commentsTree;
+    }
+
+    public function createCommentNode(Comment $comment, array $childsOfEachComment, $inheritanceLevel): CommentNodeDto
+    {
+        $commentNode = new CommentNodeDto();
+        $commentNode->setContent($comment->getContent());
+
+
+        $commentNode->setInheritanceLevel($inheritanceLevel);
+
+        $user = $this->userRepo->getById($comment->getUser()->getId());
+        $commentNode->setUser($user);
+
+        $date = date('M j Y g:i A', strtotime($comment->getTs()));;
+        $commentNode->setDate($date);
+
+        if ($this->hasComments($comment, $childsOfEachComment))
+            foreach ($childsOfEachComment[$comment->getId()] as $childComment) {
+                $childCommentNode = $this->createCommentNode($childComment, $childsOfEachComment, ++$inheritanceLevel);
+                $commentNode->addChild($childCommentNode);
+            }
+
+        if ($commentNode->getChilds() !== null && sizeof($commentNode->getChilds()) != 0) {
+            uasort($commentNode->getChilds(), function (CommentNodeDto $comment1, CommentNodeDto $comment2) {
+                if ($comment1->getDate() == $comment2->getDate()) {
+                    return 0;
+                }
+                return ($comment1->getDate() < $comment2->getDate()) ? -1 : 1;
+            });
+        }
+        return $commentNode;
+
+    }
+
+    private function hasComments(Comment $comment, array $childsOfEachComment): bool
+    {
+        try {
+            $childsOfEachComment[$comment->getId()];
+        } catch (ErrorException $e) {
+            return false;
+        }
+
+        if ($childsOfEachComment[$comment->getId()] == null)
+            return false;
+        else return true;
+
+    }
+
+    private function buildChildsOfEachComment(array $comments): array
+    {
+        $mapChilds = array();
+        foreach ($comments as $comment) {
+            if ($comment->getParentId() != null) {
+                if ($mapChilds[$comment->getParentId()] == null)
+                    $mapChilds[$comment->getParentId()] = array();
+                array_push($mapChilds[$comment->getParentId()], $comment);
+            }
+        }
+        return $mapChilds;
+    }
+
+
 }

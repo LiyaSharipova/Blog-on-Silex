@@ -1,8 +1,13 @@
 {% macro print_comments_recursively(comment) %}
-    <div class="response">
-        <p>{{ comment.content }}</p> {# implement __toString on your Comment class or print appropriate property #}
-        {% if comment.response is not null  %}
-            {{ _self.print_comments_recursively(comment.response) }}
+    <div style="margin-left: {{ comment.inheritanceLevel * 10 }}px">
+        <p>{{ comment.inheritanceLevel }}</p>
+        <p>{{ comment.user.username }}</p>
+        <p>{{ comment.date }}</p>
+        <p>{{ comment.content }}</p>
+        {% if comment.childs is not null %}
+            {% for child in comment.childs %}
+                {{ macros.print_comments_recursively(child) }}
+            {% endfor %}
         {% endif %}
     </div>
 {% endmacro %}

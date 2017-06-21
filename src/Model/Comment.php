@@ -14,9 +14,10 @@ class Comment
     private $id;
     private $user;
     private $post_id;
-    private $response;
-    private $date;
+    private $child_id;
+    private $ts;
     private $content;
+    private $parent_id;
 
     /**
      * Comment constructor.
@@ -82,33 +83,33 @@ class Comment
     /**
      * @return mixed
      */
-    public function getResponse()
+    public function getChildid()
     {
-        return $this->response;
+        return $this->child_id;
     }
 
     /**
-     * @param mixed $response
+     * @param mixed $child_id
      */
-    public function setResponse($response)
+    public function setChildid($child_id)
     {
-        $this->response = $response;
+        $this->child_id = $child_id;
     }
 
     /**
      * @return mixed
      */
-    public function getDate()
+    public function getTs()
     {
-        return $this->date;
+        return $this->ts;
     }
 
     /**
-     * @param mixed $date
+     * @param mixed $ts
      */
-    public function setDate($date)
+    public function setTs($ts)
     {
-        $this->date = date('M j Y g:i A', strtotime($date));;
+        $this->ts = date('M j Y g:i A', strtotime($ts));;
     }
 
     /**
@@ -125,6 +126,22 @@ class Comment
     public function setContent($content)
     {
         $this->content = $content;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getParentId()
+    {
+        return $this->parent_id;
+    }
+
+    /**
+     * @param mixed $parent_id
+     */
+    public function setParentId($parent_id)
+    {
+        $this->parent_id = $parent_id;
     }
 
 }
