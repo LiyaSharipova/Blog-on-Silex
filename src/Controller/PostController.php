@@ -55,6 +55,7 @@ class PostController implements ControllerProviderInterface
 
         $postController = $app['controllers_factory'];
         $postController->match("/add", array($this, "add"))->bind('addPost');
+        $postController->match("/addPhoto", array($this, "addPhoto"))->bind('addPhoto');
         $postController->match("/addComment", array($this, "add"))->bind('addComment');
         $postController->get("/all", array($this, "getAllPosts"))->bind('all');
         $postController->match("/{id}", array($this, "getPostPage"))->bind('postPage');
@@ -79,6 +80,13 @@ class PostController implements ControllerProviderInterface
 
         }
         return $app['twig']->render('addPost.html.twig', array("form" => $form->createView()));
+
+    }
+
+    function addPhoto(Application $app, Request $request)
+    {
+
+        return $app['twig']->render('addPhoto.html.twig');
 
     }
 
@@ -154,9 +162,7 @@ class PostController implements ControllerProviderInterface
             foreach ($childsOfEachComment[$comment->getId()] as $childComment) {
                 $childCommentNode = $this->createCommentNode($childComment, $childsOfEachComment, ++$inheritanceLevel);
                 $childs = $commentNode->getChilds();
-                var_dump($childCommentNode);
                 $childs[] =  $childCommentNode;
-                var_dump($childs);
                 $commentNode->setChilds($childs);
 
             }

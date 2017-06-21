@@ -60,6 +60,7 @@
                 {% if is_granted('IS_AUTHENTICATED_FULLY') %}
                     {#<li><a href="{{ app.url_generator.generate('profile') }}">Profile</a></li>#}
                     <li><a href="{{ app.url_generator.generate('addPost') }}">Add Post</a></li>
+                    {#<li><a href="{{ app.url_generator.generate('addPhoto') }}">Add photo</a></li>#}
                     <li><a href="{{ path('user_logout') }}">Log out</a></li>
 
                 {% else %}
