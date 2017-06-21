@@ -1,15 +1,18 @@
 {% macro print_comments_recursively(comment) %}
-    <div style="margin-left: {{ comment.inheritanceLevel * 40 }}px">
-        <p>{{ comment.inheritanceLevel }}</p>
-        <p>{{ comment.user.username }}</p>
-        <p>{{ comment.date }}</p>
-        <p>{{ comment.content }}</p>
-        <p>{{ comment.childs|length }}</p>
+    <div class="media" style="margin-left: {{ comment.inheritanceLevel * 40 }}px">
+        <a class="pull-left" href="#">
+            <img class="media-object" width="40px" height="40px" src="{{ comment.user.photo }}" alt="">
+        </a>
+        <div class="media-body">
+            <h4 class="media-heading">{{ comment.user.username }}
+                <small>{{ comment.date }}</small>
+            </h4>
+            {{ comment.content }}
+        </div>
         {% if comment.childs is not null %}
             {% import _self as twigdebug %}
             {% for child in comment.childs %}
                 {{ twigdebug.print_comments_recursively(child) }}
-
             {% endfor %}
         {% endif %}
     </div>
