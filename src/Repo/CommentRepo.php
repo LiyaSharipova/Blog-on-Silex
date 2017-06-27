@@ -30,7 +30,9 @@ class CommentRepo extends BaseRepo implements ICommentRepo
         $this->db->insert('comment', array(
             'user_id' => $comment->getUser()->getId(),
             'post_id' => $comment->getPostId(),
-            'content' => $comment->getContent()
+            'content' => $comment->getContent(),
+            'child_id' => null,
+            'parent_id' => null,
         ));
     }
 
